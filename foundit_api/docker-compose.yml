@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_NAME=FoundItAPI
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_KEY=base64:kBCjS7//jESgmpgVZL884mc25Lv+Gfy5nv9ghzGB7xg=
+      - APP_URL=https://foundit.neoartd.my.id
+      - DB_CONNECTION=pgsql
+      - DB_HOST=foundit_postgres
+      - DB_PORT=5432
+      - DB_DATABASE=foundit_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres_super_secret_123
+    volumes:
+      - storage_data:/var/www/html/storage/app/public
+    depends_on:
+      - foundit_postgres
+    networks:
+      - default
+      - dokploy-network
+
+  foundit_postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=foundit_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_super_secret_123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+  storage_data:
+
+networks:
+  dokploy-network:
+    external: true

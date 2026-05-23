@@ -1,0 +1,230 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+[x-cloak] {
+    display: none !important;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+@theme {
+    --font-sans: 'Poppins', 'Nunito', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+
+    /* Primary - UISI Red */
+    --color-primary-50: #fff5f5;
+    --color-primary-100: #fed7d7;
+    --color-primary-200: #feb2b2;
+    --color-primary-300: #fc8181;
+    --color-primary-400: #f56565;
+    --color-primary-500: #e53e3e;
+    --color-primary-600: #c53030;
+    --color-primary-700: #9b2c2c;
+    --color-primary-800: #742a2a;
+    --color-primary-900: #5a2020;
+
+    /* Secondary - Slate Gray */
+    --color-secondary-50: #f7fafc;
+    --color-secondary-100: #edf2f7;
+    --color-secondary-200: #e2e8f0;
+    --color-secondary-300: #cbd5e0;
+    --color-secondary-400: #a0aec0;
+    --color-secondary-500: #718096;
+    --color-secondary-600: #4a5568;
+    --color-secondary-700: #2d3748;
+    --color-secondary-800: #1a202c;
+    --color-secondary-900: #171923;
+
+    /* Success */
+    --color-success-50: #f0fff4;
+    --color-success-100: #c6f6d5;
+    --color-success-500: #38a169;
+    --color-success-600: #2f855a;
+    --color-success-700: #22543d;
+
+    /* Error */
+    --color-error-50: #fff5f5;
+    --color-error-100: #fed7d7;
+    --color-error-500: #e53e3e;
+
+    /* Warning */
+    --color-warning-50: #fffaf0;
+    --color-warning-100: #feebc8;
+    --color-warning-500: #dd6b20;
+    --color-warning-600: #c05621;
+    --color-warning-700: #7b341e;
+
+    /* Background & Surfaces */
+    --color-app-bg: #f1f5f9;
+    --color-app-surface: #ffffff;
+    --color-app-surface-variant: #f8fafc;
+
+    /* Override slate colors for better contrast and definition */
+    --color-slate-50: #f8fafc;
+    --color-slate-100: #e2e8f0;
+    --color-slate-200: #cbd5e1;
+    --color-slate-300: #94a3b8;
+    --color-slate-400: #64748b;
+    --color-slate-500: #475569;
+    --color-slate-600: #334155;
+    --color-slate-700: #1e293b;
+    --color-slate-800: #0f172a;
+    --color-slate-900: #020617;
+
+    /* Text */
+    --color-primary: #1e293b;
+    --color-secondary: #475569;
+    --color-tertiary: #64748b;
+    --color-heading-color: #0f172a;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
+    --shadow-primary: 0 4px 12px 0 rgba(229, 62, 62, 0.18);
+
+    /* Gradients */
+    --background-image-primary-gradient: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%);
+    --background-image-blue-gradient: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+    --background-image-emerald-gradient: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+    --background-image-orange-gradient: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+    --background-image-purple-gradient: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+
+    /* Custom Layout Variables */
+    --sidebar-width: 260px;
+    --sidebar-bg: var(--color-app-surface);
+    --topbar-height: 64px;
+    --border-color: #cbd5e1;
+    --transition-speed: 0.2s;
+}
+
+@layer components {
+    /* Custom Utilities */
+    .bg-primary-gradient {
+        background-image: var(--background-image-primary-gradient);
+    }
+    .bg-blue-gradient {
+        background-image: var(--background-image-blue-gradient);
+    }
+    .bg-emerald-gradient {
+        background-image: var(--background-image-emerald-gradient);
+    }
+    .bg-orange-gradient {
+        background-image: var(--background-image-orange-gradient);
+    }
+    .bg-purple-gradient {
+        background-image: var(--background-image-purple-gradient);
+    }
+    
+    /* ========== SIDEBAR ========== */
+    .sidebar {
+        @apply fixed top-0 left-0 h-screen overflow-y-auto overflow-x-hidden z-[1050] transition-all duration-300 border-r border-slate-100 bg-white;
+        width: var(--sidebar-width);
+    }
+
+    .sidebar .brand {
+        @apply flex items-center gap-3 px-6 py-6 sticky top-0 z-10 bg-white;
+        min-height: var(--topbar-height);
+    }
+
+    .sidebar .nav-section {
+        @apply px-4 pt-4 pb-2;
+    }
+
+    .sidebar .nav-section-title {
+        @apply text-tertiary text-[11px] font-bold uppercase tracking-[1px] opacity-60 px-4;
+    }
+
+    .sidebar .nav-link {
+        @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-secondary transition-all duration-200 relative mx-4;
+    }
+
+    .sidebar .nav-link svg {
+        @apply w-5 h-5 flex-shrink-0 text-tertiary transition-colors;
+    }
+
+    .sidebar .nav-link:hover {
+        @apply bg-slate-50 text-primary;
+    }
+
+    .sidebar .nav-link.active {
+        @apply bg-primary-50 text-primary-600 font-semibold;
+    }
+
+    .sidebar .nav-link.active svg {
+        @apply text-primary-600;
+    }
+
+    .sidebar-divider {
+        @apply h-px bg-slate-100 mx-8 my-4;
+    }
+
+    /* ========== TOPBAR ========== */
+    .topbar {
+        @apply sticky top-4 z-[1000] flex justify-between items-center h-[var(--topbar-height)] mx-4 lg:mx-8 px-6 bg-white rounded-2xl border border-slate-100 shadow-sm;
+    }
+
+    .topbar .nav-icon-btn {
+        @apply flex items-center justify-center w-10 h-10 rounded-xl text-secondary transition-all hover:bg-gray-100 hover:text-primary-600;
+    }
+
+    .topbar .user-avatar {
+        @apply flex items-center justify-center w-10 h-10 rounded-full bg-primary-500 text-white font-bold text-sm shadow-sm transition-all hover:scale-105 active:scale-95 overflow-hidden;
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .main-content {
+        @apply min-h-screen bg-app-bg transition-all duration-300 ease-in-out flex flex-col;
+    }
+
+    @media (min-width: 1024px) {
+        .main-content {
+            margin-left: var(--sidebar-width);
+        }
+    }
+
+    .content-wrapper {
+        @apply px-4 lg:px-8 pt-12 pb-6 lg:pt-16 lg:pb-8;
+    }
+
+    .content-wrapper.dashboard-wrapper {
+        @apply pt-8 lg:pt-10;
+    }
+
+    /* Force Laravel pagination to stay in light mode. */
+    nav[aria-label='Pagination Navigation'] {
+        @apply text-slate-700;
+    }
+
+    nav[aria-label='Pagination Navigation'] a,
+    nav[aria-label='Pagination Navigation'] span[aria-disabled='true'] > span,
+    nav[aria-label='Pagination Navigation'] span[aria-disabled='true'].inline-flex,
+    nav[aria-label='Pagination Navigation'] span[aria-current='page'] > span,
+    nav[aria-label='Pagination Navigation'] span[aria-disabled='true'] {
+        @apply bg-white border-slate-200 text-slate-600;
+    }
+
+    nav[aria-label='Pagination Navigation'] a:hover {
+        @apply bg-slate-100 text-slate-700;
+    }
+
+    nav[aria-label='Pagination Navigation'] a:focus {
+        @apply ring-primary-200 border-primary-300;
+    }
+
+    nav[aria-label='Pagination Navigation'] span[aria-current='page'] > span {
+        @apply bg-primary-500 text-white border-primary-500;
+    }
+
+    nav[aria-label='Pagination Navigation'] span[aria-disabled='true'] > span,
+    nav[aria-label='Pagination Navigation'] span[aria-disabled='true'].inline-flex {
+        @apply opacity-60;
+    }
+}
