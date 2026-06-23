@@ -168,4 +168,93 @@ class AuthIntegrationTest extends TestCase
         $response = $this->getJson('/api/profile');
         $response->assertStatus(401);
     }
+
+    /**
+     * IT-AUTH09: Registrasi gagal dengan nomor HP yang sudah terdaftar
+     */
+    public function test_register_fails_with_duplicate_phone(): void
+    {
+        User::factory()->create(['phone' => '081234567890']);
+
+        $response = $this->postJson('/api/register', [
+            'name' => 'Budi Baru',
+            'email' => 'budibaru@student.uisi.ac.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'phone' => '081234567890',
+            'prodi_unit' => 'Teknik Informatika',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['phone']);
+    }
+
+    /**
+     * IT-AUTH10: Registrasi berhasil dan nomor HP +62 dinormalisasi ke 0
+     */
+    public function test_register_normalizes_international_phone(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Budi International',
+            'email' => 'budi_int@student.uisi.ac.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'phone' => '+6281234567890',
+            'prodi_unit' => 'Teknik Informatika',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', [
+            'email' => 'budi_int@student.uisi.ac.id',
+            'phone' => '081234567890'
+        ]);
+    }
+
+    /**
+     * IT-AUTH11: Mengirim request POST dengan header Content-Type text/plain ditolak dengan HTTP 415
+     */
+    public function test_unsupported_content_type_returns_415(): void
+    {
+        $response = $this->withHeaders([
+            'Content-Type' => 'text/plain',
+        ])->post('/api/register', [
+            'name' => 'Budi Error',
+            'email' => 'budi_error@student.uisi.ac.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'phone' => '081234567891',
+            'prodi_unit' => 'Teknik Informatika',
+        ]);
+
+        $response->assertStatus(415)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Unsupported Media Type',
+            ]);
+    }
+
+    /**
+     * IT-AUTH12: Login rate limiting limits attempts to 10 per minute
+     */
+    public function test_login_rate_limiting_works(): void
+    {
+        User::factory()->create([
+            'email' => 'siti2@student.uisi.ac.id',
+            'password' => bcrypt('rahasia123'),
+        ]);
+
+        for ($i = 0; $i < 10; $i++) {
+            $response = $this->postJson('/api/login', [
+                'email' => 'siti2@student.uisi.ac.id',
+                'password' => 'wrong-password',
+            ]);
+            $response->assertStatus(401);
+        }
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'siti2@student.uisi.ac.id',
+            'password' => 'wrong-password',
+        ]);
+        $response->assertStatus(429);
+    }
 }

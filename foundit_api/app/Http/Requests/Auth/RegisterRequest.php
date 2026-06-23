@@ -15,6 +15,25 @@ class RegisterRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('phone')) {
+            $phone = $this->input('phone');
+            $phone = str_replace([' ', '-'], '', $phone);
+            if (str_starts_with($phone, '+62')) {
+                $phone = '0' . substr($phone, 3);
+            } elseif (str_starts_with($phone, '62')) {
+                $phone = '0' . substr($phone, 2);
+            }
+            $this->merge([
+                'phone' => $phone,
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
@@ -30,7 +49,7 @@ class RegisterRequest extends FormRequest
                 'regex:/^[a-zA-Z0-9._%+-]+@(student\.uisi\.ac\.id|uisi\.ac\.id)$/',
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['required', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'regex:/^08[0-9]{8,11}$/', 'unique:users,phone'],
             'prodi_unit' => ['required', 'string', 'max:100'],
         ];
     }
@@ -51,7 +70,8 @@ class RegisterRequest extends FormRequest
             'password.min' => 'Password minimal 8 karakter',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
             'phone.required' => 'Nomor HP wajib diisi',
-            'phone.max' => 'Nomor HP maksimal 20 karakter',
+            'phone.regex' => 'Nomor HP tidak valid',
+            'phone.unique' => 'Nomor HP sudah terdaftar',
             'prodi_unit.required' => 'Prodi/Unit wajib diisi',
             'prodi_unit.max' => 'Prodi/Unit maksimal 100 karakter',
         ];

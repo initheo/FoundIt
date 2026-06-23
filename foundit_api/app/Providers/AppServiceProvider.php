@@ -43,5 +43,12 @@ class AppServiceProvider extends ServiceProvider
                 SecurityScheme::http('bearer', 'Bearer Token')
             );
         });
+
+        \Illuminate\Support\Facades\RateLimiter::for('login', function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(10)->by(
+                $request->input('email') . '|' . $request->ip()
+            );
+        });
     }
 }
+

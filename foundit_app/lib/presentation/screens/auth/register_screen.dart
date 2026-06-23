@@ -162,7 +162,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 CustomTextField(
                   controller: _passwordController,
                   label: 'Password',
-                  hint: 'Minimal 6 karakter',
+                  hint: 'Minimal 8 karakter',
                   icon: Icons.lock_outline,
                   obscureText: _obscurePassword,
                   validator: Validators.password,

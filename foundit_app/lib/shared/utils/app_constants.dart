@@ -33,7 +33,7 @@ class AppConstants {
   static const String userKey = 'user_data';
 
   // Validation
-  static const int minPasswordLength = 6;
+  static const int minPasswordLength = 8;
   static const int maxPhotos = 3;
   static const List<String> validEmailDomains = [
     '@student.uisi.ac.id',

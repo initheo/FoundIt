@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 // Auth Routes (Public)
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
 // Protected Routes (Require Token)
 Route::middleware('auth:sanctum')->group(function () {
