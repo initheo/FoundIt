@@ -231,7 +231,7 @@ class ItemController extends Controller
 
         $request->validate([
             'category_id' => 'sometimes|exists:categories,id',
-            'title' => 'sometimes|string|max:255',
+            'title' => 'sometimes|string|min:5|max:255',
             'description' => 'sometimes|string',
             'location' => 'sometimes|string|max:255',
             'location_detail' => 'nullable|string|max:255',
@@ -239,6 +239,8 @@ class ItemController extends Controller
             'longitude' => 'nullable|numeric|between:-180,180',
             'date_time' => 'sometimes|date',
             'storage_info' => 'nullable|string|max:100',
+        ], [
+            'title.min' => 'Judul barang minimal 5 karakter',
         ]);
 
         $item->update($request->only([
