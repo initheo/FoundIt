@@ -125,9 +125,6 @@ class _ReportFoundScreenState extends State<ReportFoundScreen> {
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: source,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 80,
       );
 
       if (image != null) {
