@@ -211,4 +211,30 @@ class ItemUnitTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['photos']);
     }
+
+    /**
+     * UT-09 (Boundary): Store item dengan foto melebihi 2MB (Harus Gagal).
+     */
+    public function test_store_item_photo_size_limit(): void
+    {
+        $user = User::factory()->create();
+        $category = Category::factory()->create();
+
+        $data = [
+            'type' => 'found',
+            'category_id' => $category->id,
+            'title' => 'Barang dengan foto besar',
+            'description' => 'Deskripsi barang',
+            'location' => 'Gedung B',
+            'date_time' => '2026-01-01 10:00:00',
+            'photos' => [
+                UploadedFile::fake()->create('large_photo.jpg', 3000) // 3000 KB (> 2048 KB)
+            ]
+        ];
+
+        $response = $this->actingAs($user)->postJson('/api/items', $data);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['photos.0']);
+    }
 }

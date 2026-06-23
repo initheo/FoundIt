@@ -139,4 +139,34 @@ class ProfileIntegrationTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    /**
+     * IT-PRF09: Update nomor HP ke nomor yang sudah dipakai user lain ditolak
+     */
+    public function test_update_phone_to_existing_phone_rejected(): void
+    {
+        User::factory()->create(['phone' => '089876543210']);
+
+        $response = $this->actingAs($this->user)->putJson('/api/profile', [
+            'phone' => '089876543210',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['phone']);
+    }
+
+    /**
+     * IT-PRF10: Upload foto profil melebihi 2MB ditolak
+     */
+    public function test_upload_profile_photo_fails_when_exceeding_2mb(): void
+    {
+        Storage::fake('public');
+
+        $response = $this->actingAs($this->user)->postJson('/api/profile/photo', [
+            'photo' => UploadedFile::fake()->create('profile.jpg', 3000), // 3MB
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['photo']);
+    }
 }
