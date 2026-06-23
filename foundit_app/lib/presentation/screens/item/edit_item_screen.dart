@@ -191,12 +191,19 @@ class _EditItemScreenState extends State<EditItemScreen> {
 
     if (pickedFile == null) return;
 
+    final file = File(pickedFile.path);
+    final sizeInBytes = await file.length();
+    if (sizeInBytes > 2 * 1024 * 1024) {
+      _showError('Ukuran foto melebihi 2MB');
+      return;
+    }
+
     setState(() => _isUploadingPhoto = true);
 
     try {
       final result = await _itemRepository.addItemPhoto(
         widget.item.id,
-        File(pickedFile.path),
+        file,
       );
 
       setState(() {
@@ -390,6 +397,9 @@ class _EditItemScreenState extends State<EditItemScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Judul barang wajib diisi';
+                    }
+                    if (value.trim().length < 5) {
+                      return 'Judul barang minimal 5 karakter';
                     }
                     return null;
                   },

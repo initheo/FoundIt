@@ -131,8 +131,20 @@ class _ReportFoundScreenState extends State<ReportFoundScreen> {
       );
 
       if (image != null) {
+        final file = File(image.path);
+        final sizeInBytes = await file.length();
+        if (sizeInBytes > 2 * 1024 * 1024) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ukuran foto melebihi 2MB'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+          return;
+        }
         setState(() {
-          _selectedImages.add(File(image.path));
+          _selectedImages.add(file);
         });
       }
     } catch (e) {
@@ -277,6 +289,9 @@ class _ReportFoundScreenState extends State<ReportFoundScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Judul barang wajib diisi';
+                    }
+                    if (value.trim().length < 5) {
+                      return 'Judul barang minimal 5 karakter';
                     }
                     return null;
                   },
