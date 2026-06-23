@@ -179,10 +179,14 @@ class ClaimController extends Controller
             ], 422);
         }
 
+        // Generate unique verification code for pickup
+        $verificationCode = strtoupper(\Illuminate\Support\Str::random(8));
+
         // Approve klaim
         $claim->update([
             'status' => 'approved',
             'reviewed_at' => now(),
+            'verification_code' => $verificationCode,
         ]);
 
         // Update status item menjadi 'claimed'

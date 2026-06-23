@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api(prepend: [
             \App\Http\Middleware\ValidateContentType::class,
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('admin.login'));

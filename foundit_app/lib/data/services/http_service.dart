@@ -2,16 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../shared/utils/utils.dart';
+import 'services.dart';
 
 class HttpService {
   final String baseUrl = AppConstants.apiBaseUrl;
+  final SecureStorageService _secureStorage = SecureStorageService();
 
   Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+    return await _secureStorage.getToken();
   }
 
   Future<Map<String, String>> _headers({bool isMultipart = false}) async {
