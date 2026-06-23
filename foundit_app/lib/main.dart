@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foundit_app/presentation/screens/auth/login_screen.dart';
+import 'package:foundit_app/presentation/screens/main_navigation_screen.dart';
+import 'package:foundit_app/data/services/secure_storage_service.dart';
 
 import 'shared/utils/utils.dart';
 
@@ -35,8 +37,35 @@ class FoundItApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const LoginScreen(),
+      home: FutureBuilder<Map<String, dynamic>>(
+        future: _checkLoginStatus(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          if (snapshot.hasData && snapshot.data!['isLoggedIn'] == true) {
+            return MainNavigationScreen(currentUser: snapshot.data!['user']);
+          }
+          return const LoginScreen();
+        },
+      ),
     );
+  }
+
+  Future<Map<String, dynamic>> _checkLoginStatus() async {
+    final storage = SecureStorageService();
+    final isLoggedIn = await storage.isLoggedIn();
+    if (isLoggedIn) {
+      final user = await storage.getUser();
+      if (user != null) {
+        return {'isLoggedIn': true, 'user': user};
+      }
+    }
+    return {'isLoggedIn': false};
   }
 }
 
