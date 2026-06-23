@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import '../../shared/utils/utils.dart';
 import '../model/user_model.dart';
 import '../services/services.dart';
 import '../usecase/request/login_request.dart';
@@ -86,5 +85,10 @@ class AuthRepository {
   // ============ GET CURRENT USER ============
   Future<UserModel?> getCurrentUser() async {
     return await _secureStorage.getUser();
+  }
+
+  // ============ SAVE USER DATA ============
+  Future<void> saveUser(UserModel user) async {
+    await _secureStorage.saveUser(user);
   }
 }
