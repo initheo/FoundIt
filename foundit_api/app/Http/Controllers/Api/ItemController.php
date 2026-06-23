@@ -161,6 +161,16 @@ class ItemController extends Controller
             'storage_info' => 'nullable|string|max:100',
             'photos' => 'nullable|array|max:3',
             'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'photos.*.max' => 'Ukuran foto maksimal 2MB',
+            'photos.*.image' => 'File harus berupa gambar',
+            'photos.*.mimes' => 'Format foto harus jpeg, png, atau jpg',
+            'photos.max' => 'Maksimal 3 foto per item',
+            'title.required' => 'Judul barang wajib diisi',
+            'title.min' => 'Judul barang minimal 5 karakter',
+            'description.required' => 'Deskripsi wajib diisi',
+            'location.required' => 'Lokasi wajib diisi',
+            'date_time.required' => 'Tanggal & waktu wajib diisi',
         ]);
 
         $item = Item::create([
@@ -422,6 +432,11 @@ class ItemController extends Controller
 
         $request->validate([
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'photo.required' => 'Foto wajib diupload',
+            'photo.image' => 'File harus berupa gambar',
+            'photo.mimes' => 'Format foto harus jpeg, png, atau jpg',
+            'photo.max' => 'Ukuran foto maksimal 2MB',
         ]);
 
         $path = $request->file('photo')->store('items', 'public');
