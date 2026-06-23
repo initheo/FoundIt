@@ -72,7 +72,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
 
     if (pickedFile != null) {
-      setState(() => _selectedPhoto = File(pickedFile.path));
+      final file = File(pickedFile.path);
+      final sizeInBytes = await file.length();
+      if (sizeInBytes > 2 * 1024 * 1024) {
+        _showError('Ukuran foto melebihi 2MB');
+        return;
+      }
+      setState(() => _selectedPhoto = file);
       await _uploadPhoto();
     }
   }
