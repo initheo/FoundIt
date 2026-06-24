@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../data/repository/auth_repository.dart';
@@ -28,11 +29,29 @@ class _LoginScreenState extends State<LoginScreen> {
   // Loading state
   bool _isLoading = false;
 
+  // Rate limiting timer
+  Timer? _timer;
+  int _secondsRemaining = 0;
+
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _timer?.cancel();
     super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining > 0) {
+        setState(() {
+          _secondsRemaining--;
+        });
+      } else {
+        _timer?.cancel();
+      }
+    });
   }
 
   Future<void> _handleLogin() async {
@@ -62,6 +81,20 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => MainNavigationScreen(currentUser: loggedInUser),
+        ),
+      );
+    } on RateLimitException catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _secondsRemaining = e.retryAfter;
+      });
+      _startTimer();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: AppColors.error,
         ),
       );
     } catch (e) {
@@ -151,9 +184,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Login Button
                   PrimaryButton(
-                    text: 'LOGIN',
+                    text: _secondsRemaining > 0
+                        ? 'COBA LAGI DALAM ${_secondsRemaining}S'
+                        : 'LOGIN',
                     isLoading: _isLoading,
-                    onPressed: _handleLogin,
+                    onPressed: _secondsRemaining > 0 ? null : _handleLogin,
                   ),
                   const SizedBox(height: AppSpacing.lg),
 

@@ -27,6 +27,13 @@ class AuthRepository {
       return authResponse.data!.user;
     } else if (response.statusCode == 401) {
       throw Exception('Email atau password salah.');
+    } else if (response.statusCode == 429) {
+      final body = jsonDecode(response.body);
+      final retryAfter = body['retry_after'] ?? 60;
+      throw RateLimitException(
+        body['message'] ?? 'Terlalu banyak percobaan login. Silakan coba lagi nanti.',
+        retryAfter is int ? retryAfter : int.tryParse(retryAfter.toString()) ?? 60,
+      );
     } else {
       final body = jsonDecode(response.body);
       throw Exception(body['message'] ?? 'Login gagal.');
@@ -91,4 +98,14 @@ class AuthRepository {
   Future<void> saveUser(UserModel user) async {
     await _secureStorage.saveUser(user);
   }
+}
+
+class RateLimitException implements Exception {
+  final String message;
+  final int retryAfter;
+
+  RateLimitException(this.message, this.retryAfter);
+
+  @override
+  String toString() => message;
 }

@@ -45,9 +45,14 @@ class AppServiceProvider extends ServiceProvider
         });
 
         \Illuminate\Support\Facades\RateLimiter::for('login', function (\Illuminate\Http\Request $request) {
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(10)->by(
-                $request->input('email') . '|' . $request->ip()
-            );
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(10)
+                ->by($request->input('email') . '|' . $request->ip())
+                ->response(function (\Illuminate\Http\Request $request, array $headers) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Terlalu banyak percobaan login. Silakan coba lagi dalam beberapa saat.',
+                    ], 429, $headers);
+                });
         });
     }
 }
