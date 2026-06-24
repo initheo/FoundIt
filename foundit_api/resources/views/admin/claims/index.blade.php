@@ -113,8 +113,8 @@
 
                         <!-- Reason -->
                         <td class="px-6 py-4">
-                            <span class="text-xs font-semibold text-slate-600 line-clamp-2 max-w-[250px]" title="{{ $claim->description }}">
-                                "{{ $claim->description }}"
+                            <span class="text-xs font-semibold text-slate-600 line-clamp-2 max-w-[250px]" title="{{ $claim->reason }}">
+                                "{{ $claim->reason }}"
                             </span>
                         </td>
 

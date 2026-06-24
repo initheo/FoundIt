@@ -164,7 +164,7 @@
                                 </h4>
                                 <div class="flex flex-wrap items-center gap-2">
                                     <span class="text-xs text-slate-500 font-medium truncate max-w-[280px]">
-                                        Alasan: "{{ Str::limit($claim->description, 60) }}"
+                                        Alasan: "{{ Str::limit($claim->reason, 60) }}"
                                     </span>
                                 </div>
                                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tight mt-1 block">Diajukan pada {{ $claim->created_at->format('d M Y') }} ({{ $claim->created_at->diffForHumans() }})</span>

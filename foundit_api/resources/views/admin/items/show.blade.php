@@ -223,7 +223,7 @@
                                 </span>
                             </div>
 
-                            <p class="text-[11px] text-slate-500 leading-normal line-clamp-2">"{{ $claim->description }}"</p>
+                            <p class="text-[11px] text-slate-500 leading-normal line-clamp-2">"{{ $claim->reason }}"</p>
                             
                             <div class="flex justify-end border-t border-slate-100/50 pt-2">
                                 <a href="{{ route('admin.claims.show', $claim->id) }}" class="text-[10px] font-black text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-wider flex items-center gap-1 cursor-pointer">

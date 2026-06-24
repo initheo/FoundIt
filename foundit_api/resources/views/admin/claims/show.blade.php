@@ -68,7 +68,7 @@
                 <div class="space-y-2 mb-6">
                     <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Alasan Pengajuan & Bukti Kepemilikan</span>
                     <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 text-sm text-slate-700 font-medium leading-relaxed whitespace-pre-line">
-                        "{!! e($claim->description) !!}"
+                        "{!! e($claim->reason) !!}"
                     </div>
                 </div>
 
@@ -202,7 +202,7 @@
                                         {{ $oth->status }}
                                     </span>
                                 </div>
-                                <p class="text-[10px] text-slate-500 leading-relaxed line-clamp-2">"{{ $oth->description }}"</p>
+                                <p class="text-[10px] text-slate-500 leading-relaxed line-clamp-2">"{{ $oth->reason }}"</p>
                                 <div class="flex justify-end border-t border-slate-100/50 pt-2">
                                     <a href="{{ route('admin.claims.show', $oth->id) }}" class="text-[9px] font-black text-slate-500 hover:text-blue-600 transition-colors uppercase tracking-wider flex items-center gap-1 cursor-pointer">
                                         Periksa <i data-lucide="arrow-right" class="w-3 h-3"></i>
