@@ -113,11 +113,13 @@ class ItemRepository {
     }
   }
 
-  // ============ UPDATE STATUS ============
-  Future<void> updateStatus(int id, String status) async {
+  Future<void> updateStatus(int id, String status, {String? verificationCode}) async {
     final response = await _httpService.put(
       '/items/$id/status',
-      body: {'status': status},
+      body: {
+        'status': status,
+        if (verificationCode != null) 'verification_code': verificationCode,
+      },
     );
 
     if (response.statusCode != 200) {

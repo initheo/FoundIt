@@ -64,6 +64,22 @@
                     @endif
                 </div>
 
+                <!-- Verification Code (Only for Approved Claims) -->
+                @if($claim->status === 'approved' && $claim->verification_code)
+                    <div class="mb-6 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between shadow-sm">
+                        <div>
+                            <span class="text-[10px] text-emerald-500 font-bold uppercase tracking-wider block mb-0.5">Kode Verifikasi Serah Terima</span>
+                            <span class="text-lg font-black text-emerald-700 tracking-widest">{{ $claim->verification_code }}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[9px] text-emerald-500 font-bold uppercase tracking-wider block">Status Klaim</span>
+                            <span class="text-xs font-black text-emerald-600 flex items-center gap-1 mt-0.5 justify-end uppercase tracking-tight">
+                                <i class="w-4 h-4" data-feather="check-circle"></i> Disetujui
+                            </span>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Claim Reason -->
                 <div class="space-y-2 mb-6">
                     <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Alasan Pengajuan & Bukti Kepemilikan</span>

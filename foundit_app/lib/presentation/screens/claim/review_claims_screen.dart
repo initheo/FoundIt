@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../data/model/claim_model.dart';
 import '../../../data/repository/claim_repository.dart';
@@ -518,10 +519,76 @@ class _ReviewClaimsScreenState extends State<ReviewClaimsScreen> {
           ],
 
           // Contact info for approved claims
-          if (claim.isApproved && claim.claimerPhone != null) ...[
+          if (claim.isApproved) ...[
             const Divider(height: 1),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
+            // Kode verifikasi hanya ditampilkan kepada Pemilik Barang (Reporter untuk barang 'lost')
+            if (widget.isLost && claim.verificationCode != null && claim.verificationCode!.isNotEmpty) ...[
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withAlpha(15),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  border: Border.all(color: AppColors.primary.withAlpha(51)),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'KODE VERIFIKASI PENGEMBALIAN',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          claim.verificationCode!,
+                          style: AppTextStyles.h1.copyWith(
+                            color: AppColors.primary,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 4,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        IconButton(
+                          icon: const Icon(Icons.copy, size: 20, color: AppColors.primary),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: claim.verificationCode!));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Kode verifikasi disalin'),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          },
+                          constraints: const BoxConstraints(),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Cocokkan kode ini dengan kode milik pengaju saat serah-terima',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+            ],
+            if (claim.claimerPhone != null)
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.success.withAlpha(13),
                 borderRadius: const BorderRadius.vertical(

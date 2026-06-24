@@ -22,6 +22,8 @@ class ClaimModel {
   final String? itemCategory;
   final String? itemPhotoUrl;
 
+  final String? verificationCode;
+
   ClaimModel({
     required this.id,
     required this.itemId,
@@ -40,6 +42,7 @@ class ClaimModel {
     this.itemTitle,
     this.itemCategory,
     this.itemPhotoUrl,
+    this.verificationCode,
   });
 
   factory ClaimModel.fromJson(Map<String, dynamic> json) {
@@ -72,6 +75,7 @@ class ClaimModel {
       itemTitle: item?['title'],
       itemCategory: item?['category']?['name'],
       itemPhotoUrl: item?['photo_url'],
+      verificationCode: json['verification_code'],
     );
   }
 
@@ -84,6 +88,7 @@ class ClaimModel {
     'reviewed_at': reviewedAt?.toIso8601String(),
     'created_at': createdAt.toIso8601String(),
     'updated_at': updatedAt.toIso8601String(),
+    'verification_code': verificationCode,
   };
 
   bool get isPending => status == 'pending';

@@ -224,6 +224,9 @@ class _MyClaimHistoryScreenState extends State<MyClaimHistoryScreen> {
   }
 
   Widget _buildFinderContactSection() {
+    final approvedClaim = _claims.firstWhere((c) => c.isApproved);
+    final verificationCode = approvedClaim.verificationCode;
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.success.withAlpha(26),
@@ -279,6 +282,72 @@ class _MyClaimHistoryScreenState extends State<MyClaimHistoryScreen> {
 
           // Divider
           Container(height: 1, color: AppColors.success.withAlpha(51)),
+
+          // Kode verifikasi hanya ditampilkan kepada Pemilik Barang (Claimer untuk barang 'found')
+          if (_itemData?.isLost == false && verificationCode != null && verificationCode.isNotEmpty) ...[
+            Container(
+              margin: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withAlpha(15),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                border: Border.all(color: AppColors.primary.withAlpha(51)),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    'KODE VERIFIKASI PENGEMBALIAN',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        verificationCode,
+                        style: AppTextStyles.h1.copyWith(
+                          color: AppColors.primary,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 4,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      IconButton(
+                        icon: const Icon(Icons.copy, size: 20, color: AppColors.primary),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: verificationCode));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Kode verifikasi disalin'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                        },
+                        constraints: const BoxConstraints(),
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Tunjukkan kode ini saat melakukan serah-terima barang',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            Container(height: 1, color: AppColors.success.withAlpha(51)),
+          ],
 
           // Contact info
           Container(

@@ -40,6 +40,12 @@ class ClaimController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Jika tipe item adalah 'found', pembuat laporan adalah penemu.
+        // Pemilik barang adalah pengaju klaim, sehingga penemu tidak boleh melihat kode verifikasi.
+        if ($item->type === 'found') {
+            $claims->makeHidden('verification_code');
+        }
+
         return response()->json([
             'success' => true,
             'data' => $claims,
@@ -136,6 +142,13 @@ class ClaimController extends Controller
                     $claim->item->photos->first()->photo_url
                 ));
             }
+            
+            // Jika tipe item adalah 'lost', pengaju klaim adalah penemu.
+            // Pemilik barang adalah pembuat laporan (reporter), sehingga penemu tidak boleh melihat kode verifikasi.
+            if ($claim->item && $claim->item->type === 'lost') {
+                $claim->makeHidden('verification_code');
+            }
+            
             return $claim;
         });
 
@@ -202,6 +215,12 @@ class ClaimController extends Controller
             ]);
 
         $claim->load('claimer:id,name,email,prodi_unit,phone');
+
+        // Jika tipe item adalah 'found', pembuat laporan adalah penemu.
+        // Pemilik barang adalah pengaju klaim, sehingga penemu tidak boleh melihat kode verifikasi.
+        if ($claim->item && $claim->item->type === 'found') {
+            $claim->makeHidden('verification_code');
+        }
 
         return response()->json([
             'success' => true,

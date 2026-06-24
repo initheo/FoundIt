@@ -853,28 +853,72 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
 
   Future<void> _showMarkAsReturnedConfirmation() async {
-    final confirmMessage = _currentItem.isLost
-        ? 'Apakah barang ini sudah diserahkan ke pemiliknya? '
-              'Setelah ditandai, barang tidak akan tampil di daftar pencarian.'
-        : 'Apakah barang ini sudah diambil oleh pemiliknya? '
-              'Setelah ditandai, barang tidak akan tampil di daftar pencarian.';
+    final codeController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
 
-    final confirmed = await ConfirmationDialog.show(
+    final confirmMessage = _currentItem.isLost
+        ? 'Masukkan kode verifikasi dari pemilik barang untuk menyelesaikan serah-terima.'
+        : 'Masukkan kode verifikasi dari pemilik barang untuk mengonfirmasi penyerahan barang.';
+
+    final verificationCode = await showDialog<String>(
       context: context,
-      icon: Icons.check_circle_outline,
-      iconColor: AppColors.success,
-      title: 'Tandai Sudah Dikembalikan',
-      message: confirmMessage,
-      confirmText: 'Ya, Tandai',
-      confirmColor: AppColors.success,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Masukkan Kode Verifikasi'),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                confirmMessage,
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextFormField(
+                controller: codeController,
+                textCapitalization: TextCapitalization.characters,
+                decoration: const InputDecoration(
+                  labelText: 'Kode Verifikasi',
+                  hintText: 'Contoh: ABCDEFGH',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.vpn_key),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Kode verifikasi tidak boleh kosong';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(context, codeController.text.trim().toUpperCase());
+              }
+            },
+            style: FilledButton.styleFrom(backgroundColor: AppColors.success),
+            child: const Text('Konfirmasi'),
+          ),
+        ],
+      ),
     );
 
-    if (confirmed && mounted) {
-      await _markAsReturned();
+    if (verificationCode != null && verificationCode.isNotEmpty && mounted) {
+      await _markAsReturned(verificationCode);
     }
   }
 
-  Future<void> _markAsReturned() async {
+  Future<void> _markAsReturned(String verificationCode) async {
     try {
       // Show loading
       showDialog(
@@ -884,7 +928,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       );
 
       final itemRepository = ItemRepository();
-      await itemRepository.updateStatus(_currentItem.id, 'returned');
+      await itemRepository.updateStatus(
+        _currentItem.id, 
+        'returned', 
+        verificationCode: verificationCode,
+      );
 
       if (!mounted) return;
       Navigator.pop(context); // Close loading

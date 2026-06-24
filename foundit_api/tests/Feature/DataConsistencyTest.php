@@ -260,9 +260,12 @@ class DataConsistencyTest extends TestCase
         ]);
         $this->actingAs($owner)->putJson("/api/claims/{$claim->id}/approve");
 
+        $verificationCode = Claim::where('item_id', $targetItem->id)->where('status', 'approved')->first()->verification_code;
+
         // Mark as returned
         $this->actingAs($owner)->putJson("/api/items/{$targetItem->id}/status", [
             'status' => 'returned',
+            'verification_code' => $verificationCode,
         ]);
 
         // Verifikasi konsistensi statistik

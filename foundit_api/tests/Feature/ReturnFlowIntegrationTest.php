@@ -50,9 +50,12 @@ class ReturnFlowIntegrationTest extends TestCase
         $response = $this->actingAs($finder)->putJson("/api/claims/{$claimId}/approve");
         $response->assertStatus(200);
 
+        $verificationCode = Claim::find($claimId)->verification_code;
+
         // Step 4: Finder mark as returned
         $response = $this->actingAs($finder)->putJson("/api/items/{$itemId}/status", [
             'status' => 'returned',
+            'verification_code' => $verificationCode,
         ]);
         $response->assertStatus(200);
 
@@ -94,9 +97,12 @@ class ReturnFlowIntegrationTest extends TestCase
         $response = $this->actingAs($loser)->putJson("/api/claims/{$claimId}/approve");
         $response->assertStatus(200);
 
+        $verificationCode = Claim::find($claimId)->verification_code;
+
         // Step 4: Finder (approved claimer) mark as returned
         $response = $this->actingAs($finder)->putJson("/api/items/{$itemId}/status", [
             'status' => 'returned',
+            'verification_code' => $verificationCode,
         ]);
         $response->assertStatus(200);
 

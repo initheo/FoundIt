@@ -14,6 +14,7 @@ class Claim extends Model
         'claimer_id',
         'reason',
         'status',
+        'verification_code',
         'rejection_reason',
         'reviewed_at',
     ];

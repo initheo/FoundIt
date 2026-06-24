@@ -392,9 +392,23 @@ class ItemController extends Controller
             ], 403);
         }
 
+        $approvedClaim = $item->claims()->where('status', 'approved')->first();
+
         $request->validate([
             'status' => 'required|in:active,returned',
+            'verification_code' => $approvedClaim ? 'required_if:status,returned|string' : 'nullable|string',
+        ], [
+            'verification_code.required_if' => 'Kode verifikasi wajib diisi untuk menyelesaikan pengembalian',
         ]);
+
+        if ($request->status === 'returned' && $approvedClaim) {
+            if ($approvedClaim->verification_code !== $request->verification_code) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kode verifikasi salah atau tidak sesuai',
+                ], 422);
+            }
+        }
 
         $item->update(['status' => $request->status]);
 

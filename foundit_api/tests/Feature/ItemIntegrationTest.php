@@ -57,14 +57,16 @@ class ItemIntegrationTest extends TestCase
         $item = Item::factory()->create(['user_id' => $userA->id, 'type' => 'lost', 'status' => 'claimed']);
         
         // Buat klaim yang sudah approved agar bisa update status
-        Claim::factory()->create([
+        $claim = Claim::factory()->create([
             'item_id' => $item->id, 
             'claimer_id' => $userB->id, 
-            'status' => 'approved'
+            'status' => 'approved',
+            'verification_code' => 'TEST1234',
         ]);
 
         $response = $this->actingAs($userB)->putJson("/api/items/{$item->id}/status", [
-            'status' => 'returned'
+            'status' => 'returned',
+            'verification_code' => 'TEST1234',
         ]);
 
         $response->assertStatus(200);

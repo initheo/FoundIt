@@ -26,7 +26,7 @@ class ClaimModelTest extends TestCase
     {
         $expected = [
             'item_id', 'claimer_id', 'reason', 'status',
-            'rejection_reason', 'reviewed_at',
+            'verification_code', 'rejection_reason', 'reviewed_at',
         ];
         $this->assertEquals($expected, $this->claim->getFillable());
     }
