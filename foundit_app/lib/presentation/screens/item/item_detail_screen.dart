@@ -956,7 +956,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Gagal: ${e.toString().replaceFirst("Exception: ", "")}',
+            e.toString().replaceFirst("Exception: ", ""),
           ),
           backgroundColor: AppColors.error,
         ),
