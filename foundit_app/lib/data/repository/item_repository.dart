@@ -14,7 +14,7 @@ class ItemRepository {
     List<String> params = [];
 
     if (type != null) params.add('type=$type');
-    if (search != null) params.add('search=$search');
+    if (search != null) params.add('search=${Uri.encodeComponent(search)}');
 
     if (params.isNotEmpty) {
       endpoint += '?${params.join('&')}';

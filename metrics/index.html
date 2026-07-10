@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoundIt Code Coverage Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0e12;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { width: 100%; max-width: 1000px; }
+        header { margin-bottom: 45px; text-align: center; }
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #34d399 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        header p { color: var(--text-secondary); font-size: 1.1rem; }
+        
+        .main-summary {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 10px;
+            border-right: 1px solid var(--border-color);
+        }
+        .summary-item:last-child {
+            border-right: none;
+        }
+        
+        .summary-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+        .summary-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 5px;
+        }
+        
+        .sub-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .sub-summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sub-summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .grid-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-sections { grid-template-columns: 1fr; }
+            .main-summary { grid-template-columns: 1fr; }
+            .sub-summary { grid-template-columns: 1fr; }
+            .summary-item { border-right: none; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+            .summary-item:last-child { border-bottom: none; }
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-badge {
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .file-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            margin-bottom: 4px;
+        }
+        .file-row:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .file-info { flex: 1; margin-right: 15px; overflow: hidden; }
+        .file-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .file-stats { font-size: 0.8rem; color: var(--text-secondary); }
+        
+        .coverage-bar-container {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        .coverage-bar { height: 100%; border-radius: 3px; }
+        .coverage-pct { font-weight: 700; width: 55px; text-align: right; font-size: 0.9rem; }
+        
+        .badge-green { color: var(--accent-green); background-color: rgba(16, 185, 129, 0.1); }
+        .badge-orange { color: var(--accent-orange); background-color: rgba(245, 158, 11, 0.1); }
+        .badge-red { color: var(--accent-red); background-color: rgba(239, 68, 68, 0.1); }
+        .badge-blue { color: var(--accent-blue); background-color: rgba(59, 130, 246, 0.1); }
+        
+        .bg-green { background-color: var(--accent-green); }
+        .bg-orange { background-color: var(--accent-orange); }
+        .bg-red { background-color: var(--accent-red); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FoundIt Code Coverage Dashboard</h1>
+            <p>Unified Automated Test Coverage (Backend API & Mobile Frontend)</p>
+        </header>
+        
+        <!-- MAIN LINES COVERAGE -->
+        <div class="main-summary">
+            <div class="summary-item">
+                <div class="summary-value" style="color: var(--accent-green);">91.95%</div>
+                <div class="summary-label">Combined Lines Coverage</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" style="color: var(--accent-blue);">94.07%</div>
+                <div class="summary-label">Frontend (Flutter Lines)</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" style="color: var(--accent-purple);">91.26%</div>
+                <div class="summary-label">Backend (Laravel Lines)</div>
+            </div>
+        </div>
+        
+        <!-- SUB SUMMARY (STATEMENT & BRANCH) -->
+        <div class="sub-summary">
+            <div class="sub-summary-card">
+                <div>
+                    <div class="summary-label" style="text-align: left;">Combined Statement Coverage</div>
+                </div>
+                <div class="sub-summary-value" style="color: #38bdf8;">91.9%</div>
+            </div>
+            <div class="sub-summary-card">
+                <div>
+                    <div class="summary-label" style="text-align: left;">Combined Branch Coverage</div>
+                </div>
+                <div class="sub-summary-value" style="color: #f472b6;">80.5%</div>
+            </div>
+        </div>
+        
+        <div class="grid-sections">
+            <!-- FRONTEND CARD -->
+            <div class="card">
+                <h2>
+                    <span>📱 Mobile Frontend</span>
+                    <span class="card-badge badge-blue">Flutter</span>
+                </h2>
+                
+                <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-secondary);">
+                    Lines Hit: <strong>238</strong> / 253
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/shared/utils/app_constants.dart">lib/shared/utils/app_constants.dart</div>
+                        <div class="file-stats">Lines: 6/6</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/data/model/user_model.dart">lib/data/model/user_model.dart</div>
+                        <div class="file-stats">Lines: 17/17</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/shared/utils/validators.dart">lib/shared/utils/validators.dart</div>
+                        <div class="file-stats">Lines: 29/29</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/data/model/category_model.dart">lib/data/model/category_model.dart</div>
+                        <div class="file-stats">Lines: 7/7</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/data/model/leaderboard_entry.dart">lib/data/model/leaderboard_entry.dart</div>
+                        <div class="file-stats">Lines: 14/14</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/data/model/claim_model.dart">lib/data/model/claim_model.dart</div>
+                        <div class="file-stats">Lines: 44/44</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/data/model/activity_entry.dart">lib/data/model/activity_entry.dart</div>
+                        <div class="file-stats">Lines: 14/14</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/shared/utils/date_formatters.dart">lib/shared/utils/date_formatters.dart</div>
+                        <div class="file-stats">Lines: 14/15</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 93.33333333333333%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">93.3%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="lib/data/model/item_model.dart">lib/data/model/item_model.dart</div>
+                        <div class="file-stats">Lines: 93/107</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 86.91588785046729%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">86.9%</div>
+                </div>
+    
+            </div>
+            
+            <!-- BACKEND CARD -->
+            <div class="card">
+                <h2>
+                    <span>⚙️ Backend API</span>
+                    <span class="card-badge" style="color: #8b5cf6; background: rgba(139, 92, 246, 0.1);">Laravel</span>
+                </h2>
+                
+                <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-secondary);">
+                    Lines Hit: <strong>710</strong> / 778
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Controllers/Api/AuthController.php">app/Http/Controllers/Api/AuthController.php</div>
+                        <div class="file-stats">Lines: 52/52</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Controllers/Api/CategoryController.php">app/Http/Controllers/Api/CategoryController.php</div>
+                        <div class="file-stats">Lines: 5/5</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Middleware/CheckRole.php">app/Http/Middleware/CheckRole.php</div>
+                        <div class="file-stats">Lines: 15/15</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Models/Category.php">app/Models/Category.php</div>
+                        <div class="file-stats">Lines: 1/1</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Models/Claim.php">app/Models/Claim.php</div>
+                        <div class="file-stats">Lines: 6/6</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Models/Item.php">app/Models/Item.php</div>
+                        <div class="file-stats">Lines: 8/8</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Models/ItemPhoto.php">app/Models/ItemPhoto.php</div>
+                        <div class="file-stats">Lines: 1/1</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Models/User.php">app/Models/User.php</div>
+                        <div class="file-stats">Lines: 7/7</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 100.0%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">100.0%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Controllers/Api/ProfileController.php">app/Http/Controllers/Api/ProfileController.php</div>
+                        <div class="file-stats">Lines: 105/108</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 97.22222222222221%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">97.2%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Controllers/Api/ClaimController.php">app/Http/Controllers/Api/ClaimController.php</div>
+                        <div class="file-stats">Lines: 141/148</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 95.27027027027027%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">95.3%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Controllers/Api/ActivityController.php">app/Http/Controllers/Api/ActivityController.php</div>
+                        <div class="file-stats">Lines: 108/116</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 93.10344827586206%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">93.1%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Middleware/SecurityHeaders.php">app/Http/Middleware/SecurityHeaders.php</div>
+                        <div class="file-stats">Lines: 11/12</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 91.66666666666666%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">91.7%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Controllers/Api/ItemController.php">app/Http/Controllers/Api/ItemController.php</div>
+                        <div class="file-stats">Lines: 230/275</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 83.63636363636363%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">83.6%</div>
+                </div>
+    
+                <div class="file-row">
+                    <div class="file-info">
+                        <div class="file-name" title="app/Http/Middleware/ValidateContentType.php">app/Http/Middleware/ValidateContentType.php</div>
+                        <div class="file-stats">Lines: 20/24</div>
+                    </div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar bg-green" style="width: 83.33333333333334%"></div>
+                    </div>
+                    <div class="coverage-pct badge-green">83.3%</div>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+</body>
+</html>

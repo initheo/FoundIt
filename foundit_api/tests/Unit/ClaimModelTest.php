@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Claim;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 /**
  * Unit Test Suite: ClaimModelTest
@@ -59,6 +59,7 @@ class ClaimModelTest extends TestCase
     public function test_has_item_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->claim, 'item'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $this->claim->item());
     }
 
     /**
@@ -67,6 +68,7 @@ class ClaimModelTest extends TestCase
     public function test_has_claimer_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->claim, 'claimer'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $this->claim->claimer());
     }
 
     /**
@@ -75,6 +77,7 @@ class ClaimModelTest extends TestCase
     public function test_has_scope_pending_method(): void
     {
         $this->assertTrue(method_exists($this->claim, 'scopePending'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, Claim::query()->pending());
     }
 
     /**
@@ -83,6 +86,7 @@ class ClaimModelTest extends TestCase
     public function test_has_scope_approved_method(): void
     {
         $this->assertTrue(method_exists($this->claim, 'scopeApproved'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, Claim::query()->approved());
     }
 
     /**
@@ -91,6 +95,7 @@ class ClaimModelTest extends TestCase
     public function test_has_scope_rejected_method(): void
     {
         $this->assertTrue(method_exists($this->claim, 'scopeRejected'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, Claim::query()->rejected());
     }
 
     /**

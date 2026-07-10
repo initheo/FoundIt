@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\User;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 /**
  * Unit Test Suite: UserModelTest
@@ -70,6 +70,7 @@ class UserModelTest extends TestCase
     public function test_has_items_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->user, 'items'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $this->user->items());
     }
 
     /**
@@ -78,6 +79,7 @@ class UserModelTest extends TestCase
     public function test_has_claims_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->user, 'claims'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $this->user->claims());
     }
 
     /**

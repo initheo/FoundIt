@@ -157,7 +157,7 @@ class ItemController extends Controller
             'location_detail' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            'date_time' => 'required|date',
+            'date_time' => 'required|date|before_or_equal:now',
             'storage_info' => 'nullable|string|max:100',
             'photos' => 'nullable|array|max:3',
             'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
@@ -171,6 +171,7 @@ class ItemController extends Controller
             'description.required' => 'Deskripsi wajib diisi',
             'location.required' => 'Lokasi wajib diisi',
             'date_time.required' => 'Tanggal & waktu wajib diisi',
+            'date_time.before_or_equal' => 'Tanggal & waktu tidak boleh di masa depan',
         ]);
 
         $item = Item::create([
@@ -237,10 +238,11 @@ class ItemController extends Controller
             'location_detail' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            'date_time' => 'sometimes|date',
+            'date_time' => 'sometimes|date|before_or_equal:now',
             'storage_info' => 'nullable|string|max:100',
         ], [
             'title.min' => 'Judul barang minimal 5 karakter',
+            'date_time.before_or_equal' => 'Tanggal & waktu tidak boleh di masa depan',
         ]);
 
         $item->update($request->only([

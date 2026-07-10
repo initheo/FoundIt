@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Category;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 /**
  * Unit Test Suite: CategoryModelTest
@@ -34,6 +34,7 @@ class CategoryModelTest extends TestCase
     public function test_has_items_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->category, 'items'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $this->category->items());
     }
 
     /**

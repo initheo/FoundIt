@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\ItemPhoto;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 /**
  * Unit Test Suite: ItemPhotoModelTest
@@ -34,6 +34,7 @@ class ItemPhotoModelTest extends TestCase
     public function test_has_item_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->photo, 'item'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $this->photo->item());
     }
 
     /**

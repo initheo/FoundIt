@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Item;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 /**
  * Unit Test Suite: ItemModelTest
@@ -60,6 +60,7 @@ class ItemModelTest extends TestCase
     public function test_has_user_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->item, 'user'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $this->item->user());
     }
 
     /**
@@ -68,6 +69,7 @@ class ItemModelTest extends TestCase
     public function test_has_category_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->item, 'category'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $this->item->category());
     }
 
     /**
@@ -76,6 +78,7 @@ class ItemModelTest extends TestCase
     public function test_has_photos_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->item, 'photos'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $this->item->photos());
     }
 
     /**
@@ -84,6 +87,7 @@ class ItemModelTest extends TestCase
     public function test_has_claims_relationship_method(): void
     {
         $this->assertTrue(method_exists($this->item, 'claims'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $this->item->claims());
     }
 
     /**
@@ -92,6 +96,7 @@ class ItemModelTest extends TestCase
     public function test_has_scope_lost_method(): void
     {
         $this->assertTrue(method_exists($this->item, 'scopeLost'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, Item::query()->lost());
     }
 
     /**
@@ -100,6 +105,7 @@ class ItemModelTest extends TestCase
     public function test_has_scope_found_method(): void
     {
         $this->assertTrue(method_exists($this->item, 'scopeFound'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, Item::query()->found());
     }
 
     /**
@@ -108,6 +114,7 @@ class ItemModelTest extends TestCase
     public function test_has_scope_active_method(): void
     {
         $this->assertTrue(method_exists($this->item, 'scopeActive'));
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, Item::query()->active());
     }
 
     /**

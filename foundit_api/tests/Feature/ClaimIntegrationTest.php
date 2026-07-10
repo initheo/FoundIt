@@ -197,7 +197,7 @@ class ClaimIntegrationTest extends TestCase
     }
 
     /**
-     * IT-CLM10: Klaim gagal jika alasan kurang dari 20 karakter
+     * Klaim gagal jika alasan kurang dari 20 karakter
      */
     public function test_claim_fails_with_short_reason(): void
     {
@@ -207,5 +207,106 @@ class ClaimIntegrationTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+    }
+
+    public function test_index_item_claims_success_for_owner()
+    {
+        Claim::factory()->create([
+            'item_id' => $this->item->id,
+            'claimer_id' => $this->claimer->id,
+        ]);
+
+        $response = $this->actingAs($this->owner)->getJson("/api/items/{$this->item->id}/claims");
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true);
+    }
+
+    public function test_index_item_claims_returns_403_for_non_owner()
+    {
+        $randomUser = User::factory()->create();
+        $response = $this->actingAs($randomUser)->getJson("/api/items/{$this->item->id}/claims");
+        $response->assertStatus(403);
+    }
+
+    public function test_index_item_claims_returns_404_for_nonexistent_item()
+    {
+        $response = $this->actingAs($this->owner)->getJson("/api/items/99999/claims");
+        $response->assertStatus(404);
+    }
+
+    public function test_cannot_claim_if_already_has_approved_claim()
+    {
+        Claim::factory()->create([
+            'item_id' => $this->item->id,
+            'claimer_id' => $this->claimer->id,
+            'status' => 'approved',
+        ]);
+
+        $response = $this->actingAs($this->claimer)->postJson('/api/claims', [
+            'item_id' => $this->item->id,
+            'reason' => 'Alasan baru yang cukup panjang untuk klaim barang saya',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'Klaim Anda sudah disetujui sebelumnya');
+    }
+
+    public function test_cannot_claim_if_already_has_pending_claim()
+    {
+        Claim::factory()->create([
+            'item_id' => $this->item->id,
+            'claimer_id' => $this->claimer->id,
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->claimer)->postJson('/api/claims', [
+            'item_id' => $this->item->id,
+            'reason' => 'Alasan baru yang cukup panjang untuk klaim barang saya',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'Anda sudah memiliki klaim yang sedang menunggu review');
+    }
+
+    public function test_cannot_approve_non_pending_claim()
+    {
+        $claim = Claim::factory()->create([
+            'item_id' => $this->item->id,
+            'claimer_id' => $this->claimer->id,
+            'status' => 'approved',
+        ]);
+
+        $response = $this->actingAs($this->owner)->putJson("/api/claims/{$claim->id}/approve");
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'Klaim sudah diproses sebelumnya');
+    }
+
+    public function test_cannot_reject_non_pending_claim()
+    {
+        $claim = Claim::factory()->create([
+            'item_id' => $this->item->id,
+            'claimer_id' => $this->claimer->id,
+            'status' => 'rejected',
+        ]);
+
+        $response = $this->actingAs($this->owner)->putJson("/api/claims/{$claim->id}/reject", [
+            'reason' => 'Alasan baru reject',
+        ]);
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'Klaim sudah diproses sebelumnya');
+    }
+
+    public function test_approve_claim_returns_404_for_nonexistent_claim()
+    {
+        $response = $this->actingAs($this->owner)->putJson("/api/claims/99999/approve");
+        $response->assertStatus(404);
+    }
+
+    public function test_reject_claim_returns_404_for_nonexistent_claim()
+    {
+        $response = $this->actingAs($this->owner)->putJson("/api/claims/99999/reject", [
+            'reason' => 'Alasan reject',
+        ]);
+        $response->assertStatus(404);
     }
 }

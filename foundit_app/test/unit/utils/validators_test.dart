@@ -71,7 +71,7 @@ void main() {
 
       /// TC-FV12: password valid jika memenuhi minimum
       test('returns null when meets minimum length', () {
-        expect(Validators.password('123456'), isNull);
+        expect(Validators.password('12345678'), isNull);
       });
     });
 
